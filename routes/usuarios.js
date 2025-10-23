@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // Registro
-router.post("/auth/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const { nombre, email, password } = req.body;
     const nuevoUser = new User({ nombre, email, password });
@@ -17,7 +17,7 @@ router.post("/auth/register", async (req, res) => {
 });
 
 // Login
-router.post("/auth/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
