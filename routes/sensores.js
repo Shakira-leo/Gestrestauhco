@@ -3,7 +3,7 @@ const router = express.Router();
 const { Historial, Sensor } = require("../models/Sensor");
 
 // Guardar datos
-router.post("/api/datos", async (req, res) => {
+router.post("/datos", async (req, res) => {
   try {
     const nuevoHistorial = new Historial(req.body);
     await nuevoHistorial.save();
@@ -15,7 +15,7 @@ router.post("/api/datos", async (req, res) => {
 });
 
 // Ver historial
-router.get("/api/historial", async (req, res) => {
+router.get("/historial", async (req, res) => {
   try {
     const datos = await Historial.find().sort({ fecha: -1 });
     res.json(datos);
@@ -25,7 +25,7 @@ router.get("/api/historial", async (req, res) => {
 });
 
 // Ver último sensor
-router.get("/api/sensor", async (req, res) => {
+router.get("/sensor", async (req, res) => {
   try {
     const sensor = await Sensor.findOne();
     res.json(sensor || {});
