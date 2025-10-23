@@ -1,36 +1,36 @@
 const express = require("express");
 const router = express.Router();
+const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 
 // Registro
-router.post("/register", async (req, res) => {
-  const { nombre, email, password } = req.body;
-  if (!nombre || !email || !password) return res.status(400).send("Faltan datos");
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
+router.post("/auth/register", async (req, res) => {
   try {
-    const user = new User({ nombre, email, password: hashedPassword });
-    await user.save();
-    res.status(201).send({ message: "Usuario registrado" });
-  } catch (err) {
-    res.status(400).send({ error: err.message });
+    const { nombre, email, password } = req.body;
+    const nuevoUser = new User({ nombre, email, password });
+    await nuevoUser.save();
+    res.status(201).send("✅ Usuario registrado");
+  } catch (error) {
+    res.status(500).send("❌ Error al registrar usuario: " + error.message);
   }
 });
 
 // Login
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.status(400).send({ error: "Usuario no encontrado" });
+router.post("/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).send("Usuario no encontrado");
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.status(400).send({ error: "Contraseña incorrecta" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).send("Contraseña incorrecta");
 
-  const token = jwt.sign({ id: user._id }, "SECRET_KEY", { expiresIn: "1h" });
-  res.send({ token, nombre: user.nombre });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    res.json({ token, user: { nombre: user.nombre, email: user.email } });
+  } catch (error) {
+    res.status(500).send("❌ Error al hacer login: " + error.message);
+  }
 });
 
 module.exports = router;
