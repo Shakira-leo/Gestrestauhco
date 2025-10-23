@@ -10,6 +10,8 @@ router.post("/datos", async (req, res) => {
     await Sensor.findOneAndUpdate({}, req.body, { upsert: true, new: true });
     res.status(201).send("✅ Dato guardado correctamente");
   } catch (err) {
+
+    
     res.status(500).send("❌ Error en el servidor");
   }
 });
